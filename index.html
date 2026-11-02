@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Deepti!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Screen overlays */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease-in-out;
+            z-index: 10;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Intro Typing Effect */
+        #intro-text {
+            font-size: 1.2rem;
+            color: #eab308; /* Yellow-ish like Python */
+            text-align: center;
+            padding: 0 20px;
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: #eab308;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Compilation Logs */
+        #log-screen {
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+            background: rgba(0,0,0,0.9);
+        }
+        
+        #log-container {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #22c55e;
+            line-height: 1.4;
+            max-height: 100vh;
+            overflow: hidden;
+            text-shadow: 0 0 5px rgba(34, 197, 94, 0.6);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .log-line {
+            margin: 2px 0;
+            word-break: break-all;
+        }
+
+        .log-error { color: #ef4444; }
+        .log-warn { color: #eab308; }
+        .log-info { color: #3b82f6; }
+
+        /* Transition Text */
+        #transition-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: #fce7f3;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(252, 231, 243, 0.8);
+        }
+
+        /* Canvas */
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Final Birthday Screen */
+        #final-screen {
+            z-index: 20;
+            background: radial-gradient(circle, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.9) 100%);
+            backdrop-filter: blur(4px);
+        }
+
+        #particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            opacity: 0;
+            animation: float-up 4s ease-in-out infinite;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+            50% { opacity: 0.9; transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
+        }
+
+        .bday-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5.5rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px #fff, 0 0 20px #ff1493, 0 0 40px #ff1493, 0 0 60px #ff1493, 0 0 80px #ff1493;
+            margin-bottom: 15px;
+            text-align: center;
+            animation: pulse-glow 2.5s infinite alternate;
+        }
+
+        .bday-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 8px;
+            text-shadow: 0 0 10px #fff, 0 0 20px #a855f7, 0 0 40px #a855f7, 0 0 60px #a855f7, 0 0 80px #a855f7;
+            text-align: center;
+            animation: float-text 3.5s ease-in-out infinite;
+        }
+
+        .signature {
+            margin-top: 50px;
+        @keyframes pulse-glow {
+            from { transform: scale(0.95); text-shadow: 0 0 5px #fff, 0 0 15px #ff1493, 0 0 30px #ff1493; }
+            to { transform: scale(1.05); text-shadow: 0 0 15px #fff, 0 0 30px #ff1493, 0 0 50px #ff1493, 0 0 70px #ff1493; }
+        }
+
+        @keyframes float-text {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .bday-title { font-size: 4rem; }
+            .bday-name { font-size: 3rem; letter-spacing: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Phase 1: Intro -->
+    <div id="intro-screen" class="screen active">
+        <div>
+            <span id="intro-text"></span><span class="cursor"></span>
+        </div>
+    </div>
+
+    <!-- Phase 2: Python Logs -->
+    <div id="log-screen" class="screen">
+        <div id="log-container"></div>
+    </div>
+
+    <!-- Phase 3: Transition -->
+    <div id="transition-screen" class="screen">
+        <div id="transition-text">Something beautiful gets compiled. 🌷</div>
+    </div>
+
+    <!-- Phase 4: Canvas Flower -->
+    <div id="canvas-container">
+        <canvas id="flowerCanvas"></canvas>
+    </div>
+
+    <!-- Phase 5: Final Greeting -->
+    <div id="final-screen" class="screen">
+        <div id="particles-container"></div>
+        <div class="bday-title">Happy Birthday,</div>
+        <div class="bday-name">DEEPTI! 🎉</div>
+        <div class="signature">Compiled with ❤️ by Shivam</div>
+    </div>
+
+    <script>
+        // --- Utilities ---
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const el = (id) => document.getElementById(id);
+
+        // --- Sequence Configuration ---
+        const INTRO_TEXT = "What happens when imagination meets Friends?";
+        
+        const FAKE_LOGS = [
+            "[INFO] Initializing Deepti virtual environment...",
+            "Loading dependencies: numpy, matplotlib, math, time...",
+            "[SUCCESS] Dependencies loaded successfully.",
+            "import bauni as bp",
+            "import motapetlib.pychap as mp",
+            "from chota dimag import sin, cos, pi, radians",
+            "[INFO] Allocating gobar buddhi for vertex buffers... OK",
+            "[INFO] Compiling gobar shaders...",
+            "def generate_floral_geometry(petals, complexity):",
+            "    # Calculating Deepti cuteness",
+            "    for chutanki in range(0, 360 * complexity):",
+            "        rad = radians(theta)",
+            "        r = single(petals * rad) * scale",
+            "        x = r * cos(rad)",
+            "        y = r * sin(rad)",
+            "        yield (x, y)",
+            "[WARN] CPU usage spiking. Optimizing matrix transformations...",
+            "Applying rotation matrices...",
+            "Mapping 3D vectors to 2D projection plane...",
+            "suar nodes: [=================>   ] 85%",
+            "suar nodes: [===================> ] 95%",
+            "suar nodes: [=====================] 100%",
+            "[SUCCESS] Deeptiiii compiled.",
+            "Executing Suarrrr loop...",
+            "sys.stdout.write('Ready.')"
+        ];
+
+        // --- Animation Functions ---
+
+        async function typeText(text, elementId, speed = 80) {
+            const element = el(elementId);
+            element.innerHTML = '';
+            for (let i = 0; i < text.length; i++) {
+                element.innerHTML += text.charAt(i);
+                await sleep(speed + Math.random() * 50); // slight random delay for realism
+            }
+        }
+
+        async function simulateLogs(containerId) {
+            const container = el(containerId);
+            container.innerHTML = '';
+            
+            for (let i = 0; i < FAKE_LOGS.length; i++) {
+                const line = document.createElement('div');
+                line.className = 'log-line';
+                let text = FAKE_LOGS[i];
+                
+                // Add color classes based on content
+                if (text.includes('[WARN]')) line.classList.add('log-warn');
+                else if (text.includes('[INFO]')) line.classList.add('log-info');
+                else if (text.includes('[SUCCESS]')) line.style.color = '#34d399';
+                
+                line.textContent = text;
+                container.appendChild(line);
+                
+                // Auto scroll to bottom
+                container.scrollTop = container.scrollHeight;
+                
+                // Speed up as it goes
+                let delay = Math.max(20, 200 - (i * 10));
+                if (text.includes('100%')) delay = 500;
+                await sleep(delay);
+            }
+        }
+
+        // --- Canvas Drawing (Maurer Rose Wireframe) ---
+        function initCanvas() {
+            const canvas = el('flowerCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+            return { canvas, ctx };
+        }
+
+        function drawProceduralFlower(canvas, ctx) {
+            return new Promise((resolve) => {
+                const cx = canvas.width / 2;
+                // Shift slightly up to make room for signature
+                const cy = canvas.height / 2 - 40; 
+                
+                // Maurer Rose parameters
+                const n = 6; // Petals
+                const d = 71; // Angle increment
+                const scale = Math.min(canvas.width, canvas.height) * 0.35;
+                
+                let i = 0;
+                const maxLines = 360;
+
+                // Draw Stem slowly first
+                let stemProgress = 0;
+                const stemHeight = canvas.height - cy;
+
+                function drawStem() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(cx, canvas.height);
+                    
+                    // Bezier curve for natural stem look
+                    const controlY = canvas.height - (stemHeight * stemProgress * 0.5);
+                    const endY = canvas.height - (stemHeight * stemProgress);
+                    
+                    ctx.quadraticCurveTo(cx - 20, controlY, cx, endY);
+                    
+                    ctx.strokeStyle = '#22c55e'; // Green stem
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#22c55e';
+                    ctx.stroke();
+
+                    stemProgress += 0.02;
+
+                    if (stemProgress <= 1) {
+                        requestAnimationFrame(drawStem);
+                    } else {
+                        // Start drawing the rose
+                        drawRose();
+                    }
+                }
+
+                // Rose drawing state
+                let rosePoints = [];
+                for(let k = 0; k <= maxLines; k++) {
+                    let k_rad = k * d * Math.PI / 180;
+                    let r = Math.sin(n * k_rad) * scale;
+                    let x = cx + r * Math.cos(k_rad);
+                    let y = cy + r * Math.sin(k_rad);
+                    rosePoints.push({x, y});
+                }
+
+                function drawRose() {
+                    if (i >= maxLines) {
+                        resolve(); // Finished drawing
+                        return;
+                    }
+
+                    ctx.globalCompositeOperation = 'lighter';
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(rosePoints[i].x, rosePoints[i].y);
+                    ctx.lineTo(rosePoints[i+1].x, rosePoints[i+1].y);
+                    
+                    // Gradient glowing color based on progress
+                    const hue = 310 + (i / maxLines) * 40; // Pink to purple
+                    ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+                    ctx.lineWidth = 1.5;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+                    
+                    ctx.stroke();
+
+                    // Optional: Draw the solid outline simultaneously for depth
+                    let k_rad = i * Math.PI / 180;
+                    let r = Math.sin(n * k_rad) * scale;
+                    let x = cx + r * Math.cos(k_rad);
+                    let y = cy + r * Math.sin(k_rad);
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                    ctx.fillStyle = 'white';
+                    ctx.shadowBlur = 5;
+                    ctx.fill();
+
+                    i++;
+                    
+                    // Draw multiple lines per frame to speed up slightly, but keep it visible
+                    if(i < maxLines) {
+                         ctx.beginPath();
+                        ctx.moveTo(rosePoints[i].x, rosePoints[i].y);
+                        ctx.lineTo(rosePoints[i+1].x, rosePoints[i+1].y);
+                        ctx.stroke();
+                        i++;
+                    }
+
+                    requestAnimationFrame(drawRose);
+                }
+
+                drawStem();
+            });
+        }
+
+        // --- Main Orchestrator ---
+        async function runSequence() {
+            // 1. Intro Typing
+            await sleep(500);
+            await typeText(INTRO_TEXT, 'intro-text');
+            await sleep(1500);
+            el('intro-screen').classList.remove('active');
+            await sleep(1000);
+
+            // 2. Compilation Logs
+            el('log-screen').classList.add('active');
+            await simulateLogs('log-container');
+            await sleep(800);
+            el('log-screen').classList.remove('active');
+            await sleep(1000);
+
+            // 3. Transition Text
+            el('transition-screen').classList.add('active');
+            await sleep(2500);
+            el('transition-screen').classList.remove('active');
+            await sleep(1000);
+
+            // 4. Draw Canvas Flower
+            const { canvas, ctx } = initCanvas();
+            await drawProceduralFlower(canvas, ctx);
+            
+            // Short pause to admire the fully drawn flower
+            await sleep(1000);
+
+            // 5. Final Reveal
+            el('final-screen').classList.add('active');
+            
+            // Start particle effect in background for final screen
+            startParticles();
+        }
+
+        // --- Bonus: Floating particles after compilation ---
+        function startParticles() {
+            const container = el('particles-container');
+            const colors = ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96'];
+            
+            for(let i=0; i<70; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                
+                const size = Math.random() * 4 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.top = Math.random() * 100 + 'vh';
+                
+                p.style.animationDelay = (Math.random() * 4) + 's';
+                p.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                p.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+                p.style.backgroundColor = '#fff';
+
+                container.appendChild(p);
+            }
+        }
+
+        // Start everything on load
+        window.onload = runSequence;
+
+    </script>
+</body>
+</html>
